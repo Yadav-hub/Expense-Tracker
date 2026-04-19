@@ -1,73 +1,88 @@
 package com.aman.expense_tracker.Service;
 
+import java.util.List;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.stereotype.Service;
-import Model.Expense;
+
+import com.aman.expense_tracker.Model.Expense;
+import com.aman.expense_tracker.Repository.ExpenseRepository;
 
 @Service
 public class ExpenseServices {
 
     
-    private Map<Integer, Expense> expenseData = new HashMap<>();
+    
 
+    private ExpenseRepository expenseRepository;
+
+    public ExpenseServices(ExpenseRepository expenseRepository)
+    {
+        this.expenseRepository = expenseRepository;
+    }
     
     public String addExpenses(Expense expense) {
-        if (expenseData.containsKey(expense.getId())) {
-            return "Expense Id is already present";
-        } else {
-            expenseData.put(expense.getId(), expense);
+        
+        if(expense != null)
+        {
+            expenseRepository.save(expense);
             return "Expense Added";
         }
 
-    }
-
-    public Map<Integer, Expense> getAllExpense() {
-        return expenseData;
+        return "Error in values";
 
     }
 
-    public String updateExpense(Expense updatedExpense) {
-        if (expenseData.containsKey(updatedExpense.getId())) {
+    public List<Expense> getAllExpense() {
+        return expenseRepository.findAll() ;
 
-            Expense exp = expenseData.get(updatedExpense.getId());
-            if (updatedExpense.getAmount() < 0) {
-                return "Wrong amount";
-            } else {
-                if(updatedExpense.getAmount() > 0.0)
-                {
-                    exp.setAmount(updatedExpense.getAmount());
-                }
-                else if(updatedExpense.getCategory()!=null)
-                {
-                    exp.setCategory(updatedExpense.getCategory());
-                }
-                else if(updatedExpense.getDescription()!=null)
-                {   
-                    exp.setDescription(updatedExpense.getDescription());
-                }
-                else if(updatedExpense.getDate()!= null) 
-                {
-                    exp.setDate(updatedExpense.getDate());
-                }             
-                
-                
-                return "Expense Updated";
+    }
+
+    public String updateExpense(int id, Expense updatedExpense) {
+        
+        Optional<Expense> exp = expenseRepository.findById(id);
+        if(exp.isPresent())
+        {
+            Expense expense = exp.get();
+            if(updatedExpense.getAmount()!=null)
+            {
+                expense.setAmount(updatedExpense.getAmount());
             }
-
+            if(updatedExpense.getCategory()!= null)
+            {
+                expense.setCategory(updatedExpense.getCategory());
+            }
+            if(updatedExpense.getDate()!=null)
+            {
+                expense.setDate(updatedExpense.getDate());
+            }
+            if(updatedExpense.getDescription()!=null)
+            {
+                expense.setDescription(updatedExpense.getDescription());
+            }
+            expenseRepository.save(expense);
+            return "Expense Updated";
         }
-        return "No id found";
+        else
+        {
+            return "Error in input";
+        }
+
     }
 
     public String deleteExpense(int id) {
-
-        if (expenseData.containsKey(id)) {
-            expenseData.remove(id);
-            return "Expense Deleted";
+        if(expenseRepository.existsById(id))
+        {
+            expenseRepository.deleteById(id);
+            return "Deleted";
         }
-        return "Id not found";
+        else
+        {
+            return "Id not valid";
+        }
+        
     }
+        
 
 }

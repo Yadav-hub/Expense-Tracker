@@ -1,19 +1,28 @@
-package Model;
+package com.aman.expense_tracker.Model;
 
 import java.time.LocalDate;
 
-import Model.CategoryType.Category;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 
 
-
+@Entity
 public class Expense {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
-    private double amount;
+    private Double amount;
     
     private LocalDate date;
     private String description;
+
+    @Enumerated(EnumType.STRING)
     private Category category;
     
 
@@ -22,10 +31,7 @@ public class Expense {
 
     }
 
-    public void setId(int id)
-    {
-        this.id = id;
-    }
+    
 
     public void setAmount(double amount)
     {
@@ -51,7 +57,7 @@ public class Expense {
     {
         return this.id;
     }
-    public double getAmount()
+    public Double getAmount()
     {
         return this.amount;
     }
